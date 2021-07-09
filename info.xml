@@ -20,6 +20,9 @@
   <compatibility>
     <ver>5.0</ver>
   </compatibility>
+  <requires>
+    <ext version=">=1.5">org.project60.sepa</ext>
+  </requires>
   <comments>currently just POC</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
