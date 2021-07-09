@@ -1,0 +1,14 @@
+{*-------------------------------------------------------+
+| SYSTOPIA SEPA Direct Debit Payment Processor           |
+| Copyright (C) 2021 SYSTOPIA                            |
+| Author: B. Endres (endres@systopia.de)                 |
+| http://www.systopia.de                                 |
+| Development based on org.project60.sepapp              |
++--------------------------------------------------------+
+| License: AGPLv3, see LICENSE file                      |
++-------------------------------------------------------*}
+
+{htxt id='id-creditor-help'}
+    <p>{ts domain="de.systopia.sddpp"}Select the creditor, that should be used for this payment processor.{/ts}</p>
+    <p>{ts domain="de.systopia.sddpp"}The creditor object not only determines the creditor ID, but also the account and the SEPA file format to be used.{/ts}</p>
+{/htxt}

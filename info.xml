@@ -23,7 +23,7 @@
   <requires>
     <ext version=">=1.5">org.project60.sepa</ext>
   </requires>
-  <comments>currently just POC</comments>
+  <comments>Based on org.project60.sepapp</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
