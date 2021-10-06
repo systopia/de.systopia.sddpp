@@ -103,7 +103,7 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
      */
     public static function postProcess($parameters, $context_data)
     {
-        CRM_Sddpp_Logger::debug("ping: " . json_encode($parameters));
+        CRM_Sddpp_Logger::debug("postProcess: " . json_encode($parameters));
 
         // first: find out if this is one of ours
         $pp_id = $parameters['payment_processor_id'] ?? null;
@@ -120,11 +120,14 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
             // RECURRING DONATION
 
             // 1. adjust recurring contribution
+            $rcur_types = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($sdd_creditor_id, 'RCUR');
+            $next_collection_date = CRM_Core_Payment_SDDPPHelper::firstCollectionDate($sdd_creditor_id);
             civicrm_api3('ContributionRecur', 'create', [
                 'id' => $parameters['contributionRecurID'],
-                'payment_instrument_id' => 'TODO',
+                'payment_instrument_id' => $rcur_types[0],
                 'contribution_status_id' => 'Pending',
-                'cycle_day' => 'TODO',
+                'cycle_day' => date('j', strtotime($next_collection_date)),
+                'start_date' => $next_collection_date,
             ]);
 
             // 2. create a mandate
@@ -142,9 +145,10 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
             ]);
 
             // 3. adjust contribution
+            $frst_types = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($sdd_creditor_id, 'FRST');
             civicrm_api3('Contribution', 'create', [
                 'id' => $parameters['contributionID'],
-                'payment_instrument_id' => 'TODO',
+                'payment_instrument_id' => $frst_types[0],
                 'contribution_status_id' => 'Pending',
             ]);
 
@@ -153,9 +157,11 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
             // SINGLE DONATION
 
             // 1. adjust recurring contribution
+            $ooff_types = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($sdd_creditor_id, 'OOFF');
+
             civicrm_api3('Contribution', 'create', [
                 'id' => $parameters['contributionID'],
-                'payment_instrument_id' => 'TODO',
+                'payment_instrument_id' => $ooff_types[0],
                 'contribution_status_id' => 'Pending',
             ]);
 

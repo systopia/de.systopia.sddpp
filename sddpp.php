@@ -160,7 +160,7 @@ function sddpp_civicrm_postPP($parameters, $context_data)
     try {
         CRM_Core_Payment_SDDPP::postProcess($parameters, $context_data);
     } catch (Exception $ex) {
-        CRM_Sddpp_Logger::debug("Exception caught: " . $ex->getMessage());
+        CRM_Sddpp_Logger::warning("Exception caught: " . $ex->getMessage());
     }
 }
 

@@ -8,31 +8,6 @@
 | License: AGPLv3, see LICENSE file                      |
 +-------------------------------------------------------*}
 
-
-{if $pre4_6_10}
-    {* add these fields manually for 4.4.x - 4.6.9 *}
-    <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
-    <div id="sdd-cycle-day-section" class="crm-section {$form.cycle_day.name}-section" style="display: none;">
-        <div class="label">{$form.cycle_day.label}</div>
-        <div class="content">{$form.cycle_day.html}</div>
-        <div class="clear"></div>
-    </div>
-    <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
-    <div id="sdd-start-date-section" class="crm-section {$form.start_date.name}-section" style="display: none;">
-        <div class="label">{$form.start_date.label}</div>
-        <div class="content">{$form.start_date.html}</div>
-        <div class="clear"></div>
-    </div>
-{literal}
-    <script type="text/javascript">
-        // in 4.4.x - 4.6.9 we could still ignore this (not mandatory)
-        cj(function () {
-            cj("fieldset.billing_name_address-group").hide();
-        });
-    </script>
-{/literal}
-{/if}
-
 {if $sepa_hide_billing}
 {literal}
     <script type="text/javascript">

@@ -44,6 +44,21 @@ class CRM_Core_Payment_SDDPPHelper
     }
 
     /**
+     * Calculate the first possible collection date, factoring in:
+     *  - payment processor buffer days
+     *  - cycle days
+     *
+     * @param integer $sdd_creditor_id
+     *
+     * @return string date
+     */
+    public static function firstCollectionDate($sdd_creditor_id)
+    {
+        // todo
+        return date('Y-m-d');
+    }
+
+    /**
      * Get a sepa creditor
      *
      * @param integer $creditor_id
