@@ -68,7 +68,7 @@ class CRM_Sddpp_Upgrader extends CRM_Sddpp_Upgrader_Base
                 "is_recur"               => "1",
                 "payment_type"           => CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
             ]);
-            Civi::log()->info("Created payment processor SDDPP.");
+            CRM_Sddpp_Logger::debug("Created payment processor SDDPP.");
 
         } else {
             // already exists => enable if not enabled
@@ -100,7 +100,7 @@ class CRM_Sddpp_Upgrader extends CRM_Sddpp_Upgrader_Base
             // todo: disable all instances?
 
         } else {
-            Civi::log()->warning("PaymentProcessor type SDDPP has gone!");
+            CRM_Sddpp_Logger::warning("PaymentProcessor type SDDPP has gone!");
         }
     }
 

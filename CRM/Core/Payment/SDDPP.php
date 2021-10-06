@@ -22,7 +22,8 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
 {
-    const TYPE_NAME = 'sddpp';
+    const TYPE_NAME  = 'sddpp';
+    const CLASS_NAME = 'Payment_SDDPP';
 
     /**
      * Override CRM_Core_Payment function
@@ -65,32 +66,36 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
      */
     public function doDirectPayment(&$params)
     {
-        Civi::log()->debug("doDirectPayment called: " . json_encode($params));
+        CRM_Sddpp_Logger::debug("doDirectPayment called: " . json_encode($params));
         $original_parameters = $params;
 
         // extract SEPA data
         $params['iban'] = $params['bank_account_number'];
         $params['bic'] = $params['bank_identification_number'];
 
-        // Allow further manipulation of the arguments via custom hooks ..
+        // Allow further manipulation of the arguments via custom hooks ...
         CRM_Utils_Hook::alterPaymentProcessorParams($this, $original_parameters, $params);
 
         // verify IBAN
         $bad_iban = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban']);
         if ($bad_iban) {
-            CRM_Sepapp_Configuration::log("IBAN issue: {$bad_iban}");
+            CRM_Sddpp_Logger::warning("IBAN issue: {$bad_iban}");
             throw new PaymentProcessorException($bad_iban);
         }
 
         // verify BIC
         $bad_bic = CRM_Sepa_Logic_Verification::verifyBIC($params['bic']);
         if ($bad_bic) {
-            CRM_Sepapp_Configuration::log("BIC issue: {$bad_bic}");
+            CRM_Sddpp_Logger::warning("BIC issue: {$bad_bic}");
             throw new PaymentProcessorException($bad_bic);
         }
 
         return $params;
     }
+
+    /****************************************************************************
+     *    PostProcessing: create mandate and put everything in place            *
+     ****************************************************************************/
 
     /**
      * (custom) Post PaymentProcessor Hook will be invoked after the payment processor
@@ -98,13 +103,77 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
      */
     public static function postProcess($parameters, $context_data)
     {
-        // todo: create the mandate and put everything in place
-        Civi::log()->debug("ping: " . json_encode($parameters));
+        CRM_Sddpp_Logger::debug("ping: " . json_encode($parameters));
+
+        // first: find out if this is one of ours
+        $pp_id = $parameters['payment_processor_id'] ?? null;
+        if (!$pp_id || !CRM_Core_Payment_SDDPPHelper::isOurPP($pp_id)) {
+            return;
+        }
+
+        // gather creditor data
+        $sdd_creditor = CRM_Core_Payment_SDDPPHelper::getCreditorFromPP($parameters['payment_processor_id']);
+        $sdd_creditor_id = $sdd_creditor['id'];
+
+        // now, let's do this:
+        if (!empty($parameters['is_recur']) && !empty($parameters['contributionRecurID'])) {
+            // RECURRING DONATION
+
+            // 1. adjust recurring contribution
+            civicrm_api3('ContributionRecur', 'create', [
+                'id' => $parameters['contributionRecurID'],
+                'payment_instrument_id' => 'TODO',
+                'contribution_status_id' => 'Pending',
+                'cycle_day' => 'TODO',
+            ]);
+
+            // 2. create a mandate
+            $mandate = civicrm_api3('SepaMandate', 'create', [
+                'contact_id' => $parameters['contactID'],
+                'creditor_id' => $sdd_creditor_id,
+                'entity_table' => 'civicrm_contribution_recur',
+                'entity_id' => $parameters['contributionRecurID'],
+                'status' => 'FRST',
+                'type' => 'RCUR',
+                'is_enabled' => 1,
+                'first_contribution_id' => $parameters['contributionID'],
+                'iban' => $parameters['iban'],
+                'bic' => $parameters['bic'],
+            ]);
+
+            // 3. adjust contribution
+            civicrm_api3('Contribution', 'create', [
+                'id' => $parameters['contributionID'],
+                'payment_instrument_id' => 'TODO',
+                'contribution_status_id' => 'Pending',
+            ]);
+
+
+        } elseif (!empty($parameters['contributionID'])) {
+            // SINGLE DONATION
+
+            // 1. adjust recurring contribution
+            civicrm_api3('Contribution', 'create', [
+                'id' => $parameters['contributionID'],
+                'payment_instrument_id' => 'TODO',
+                'contribution_status_id' => 'Pending',
+            ]);
+
+            // 2. create a mandate
+            $mandate = civicrm_api3('SepaMandate', 'create', [
+                'contact_id' => $parameters['contactID'],
+                'creditor_id' => $sdd_creditor_id,
+                'entity_table' => 'civicrm_contribution',
+                'entity_id' => $parameters['contributionID'],
+                'status' => 'OOFF',
+                'type' => 'OOFF',
+                'is_enabled' => 1,
+                'iban' => $parameters['iban'],
+                'bic' => $parameters['bic'],
+            ]);
+        }
     }
 
-    /****************************************************************************
-     *    PostProcessing: create mandate and put everything in place            *
-     ****************************************************************************/
 
     /***********************************************
      *            Form-building duty               *
@@ -114,7 +183,7 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
     {
         // add rules
         $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
-        $form->registerRule('sepa_bic_valid', 'callback', 'rule_valid_BIC', 'CRM_Sepa_Logic_Verification');
+        $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC', 'CRM_Sepa_Logic_Verification');
 
         // BUFFER DAYS / TODO: MOVE TO SERVICE
         $creditor = $this->getCreditor();
@@ -150,17 +219,14 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
      */
     protected function getCreditor()
     {
-        if (!$this->_creditor) {
+        if (empty($this->_creditor)) {
             $pp = $this->getPaymentProcessor();
             $creditor_id = $pp['user_name'];
             try {
                 $this->_creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $creditor_id]);
             } catch (Exception $ex) {
                 // probably no creditor set, or creditor has been deleted - use default
-                CRM_Sepapp_Configuration::log(
-                    "Creditor [{$creditor_id}] not found, SDDNG using default/any",
-                    CRM_Sepapp_Configuration::LOG_LEVEL_ERROR
-                );
+                CRM_Sddpp_Logger::error("Creditor [{$creditor_id}] not found, SDDNG using default/any");
                 $default_creditor_id = (int)CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
                 $creditors = civicrm_api3('SepaCreditor', 'get', ['id' => $default_creditor_id]);
                 $this->_creditor = reset($creditors['values']);
