@@ -54,7 +54,27 @@ class CRM_Core_Payment_SDDPPHelper
      */
     public static function firstCollectionDate($sdd_creditor_id)
     {
-        // todo
+        // start with now
+        $earliest_date = strtotime('now');
+
+        // add buffer days
+        $buffer_days = (int) Civi::settings()->get(CRM_Sddpp_Form_Settings::BUFFER_DAYS);
+        $earliest_date = strtotime("+{$buffer_days} days", $earliest_date);
+
+        // keep going forward until we hit a collection day
+        $cycle_days = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $sdd_creditor_id);
+        for ($i = 0; $i < 31; $i++) {
+            if (in_array(date('j', $earliest_date), $cycle_days)) {
+                // we found our cycle_day!
+                return date('Y-m-d', $earliest_date);
+            } else {
+                // no? try the next one...
+                $earliest_date = strtotime("+ 1 day", $earliest_date);
+            }
+        }
+
+        // this shouldn't happen
+        CRM_Sddpp_Logger::error("No cycle day found among " . json_encode($cycle_days));
         return date('Y-m-d');
     }
 
