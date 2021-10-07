@@ -25,16 +25,16 @@
 <!-- JS Magic -->
 <script type="text/javascript">
     // translated captions
-    var earliest_ooff_date = '{$earliest_ooff_date}';
-    var earliest_rcur_date = '{$earliest_rcur_date}';
-    var earliest_cycle_day = '{$earliest_cycle_day}';
+    let earliest_ooff_date = '{$earliest_ooff_date}';
+    let earliest_rcur_date = '{$earliest_rcur_date}';
+    let earliest_cycle_day = '{$earliest_cycle_day}';
 
     {literal}
 
     // change elements according to recur status
     function _sdd_update_elements() {
-        var is_recur = cj("#is_recur").prop('checked');
-        var start_date = cj("#start_date");
+        let is_recur = cj("#is_recur").prop('checked');
+        let start_date = cj("#start_date");
         if (is_recur) {
             if (start_date.val() < earliest_rcur_date) {
                 start_date.val(earliest_rcur_date);
@@ -65,8 +65,8 @@
 
     // IBAN changed handler
     function sepa_process_iban() {
-        var reSpaceAndMinus = new RegExp('[\\s-]', 'g');
-        var sanitized_iban = cj("#bank_account_number").val();
+        let reSpaceAndMinus = new RegExp('[\\s-]', 'g');
+        let sanitized_iban = cj("#bank_account_number").val();
         sanitized_iban = sanitized_iban.replace(reSpaceAndMinus, "");
         sanitized_iban = sanitized_iban.toUpperCase();
         cj("#bank_account_number").val(sanitized_iban);
@@ -80,11 +80,11 @@
 
 {if $bic_extension_installed}
     <script type="text/javascript">
-        var busy_icon_url = "{$config->resourceBase}i/loading.gif";
-        var sepa_hide_bic_enabled = parseInt("{$sepa_hide_bic}");
-        var sepa_lookup_bic_error_message = "{ts domain="org.project60.sepapp"}Bank unknown, please enter BIC.{/ts}";
-        var sepa_lookup_bic_timerID = 0;
-        var sepa_lookup_bic_timeout = 1000;
+        let busy_icon_url = "{$config->resourceBase}i/loading.gif";
+        let sepa_hide_bic_enabled = parseInt("{$sepa_hide_bic}");
+        let sepa_lookup_bic_error_message = "{ts domain="org.project60.sepapp"}Bank unknown, please enter BIC.{/ts}";
+        let sepa_lookup_bic_timerID = 0;
+        let sepa_lookup_bic_timeout = 1000;
         {literal}
 
         cj(function () {
@@ -132,7 +132,7 @@
                 sepa_lookup_bic_timerID = 0;
             }
 
-            var iban_partial = cj("#bank_account_number").val();
+            let iban_partial = cj("#bank_account_number").val();
             if (iban_partial == undefined || iban_partial.length == 0) return;
             if (sepa_hide_bic_enabled) {
                 // if it's hidden, we should clear it at this point
