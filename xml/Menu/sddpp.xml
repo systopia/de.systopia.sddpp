@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/sddpp</path>
+    <page_callback>CRM_Sddpp_Form_Settings</page_callback>
+    <title>CiviSEPA Payment Processor (SDDPP)</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+    <adminGroup>CiviContribute</adminGroup>
+    <desc>Alternative implementation of a CiviSEPA based payment processor.</desc>
+    <icon>admin/small/online_contribution_pages.png</icon>
+  </item>
+</menu>

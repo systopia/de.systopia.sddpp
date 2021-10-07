@@ -124,7 +124,7 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
             $next_collection_date = CRM_Core_Payment_SDDPPHelper::firstCollectionDate($sdd_creditor_id);
             civicrm_api3('ContributionRecur', 'create', [
                 'id' => $parameters['contributionRecurID'],
-                'payment_instrument_id' => $rcur_types[0],
+                'payment_instrument_id' => reset($rcur_types)['id'],
                 'contribution_status_id' => 'Pending',
                 'cycle_day' => date('j', strtotime($next_collection_date)),
                 'start_date' => $next_collection_date,
@@ -148,7 +148,7 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
             $frst_types = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($sdd_creditor_id, 'FRST');
             civicrm_api3('Contribution', 'create', [
                 'id' => $parameters['contributionID'],
-                'payment_instrument_id' => $frst_types[0],
+                'payment_instrument_id' => reset($frst_types)['id'],
                 'contribution_status_id' => 'Pending',
             ]);
 
@@ -161,7 +161,7 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
 
             civicrm_api3('Contribution', 'create', [
                 'id' => $parameters['contributionID'],
-                'payment_instrument_id' => $ooff_types[0],
+                'payment_instrument_id' => reset($ooff_types)['id'],
                 'contribution_status_id' => 'Pending',
             ]);
 

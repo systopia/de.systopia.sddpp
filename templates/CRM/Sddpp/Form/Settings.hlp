@@ -1,0 +1,34 @@
+{*-------------------------------------------------------+
+| SYSTOPIA SEPA Direct Debit Payment Processor           |
+| Copyright (C) 2021 SYSTOPIA                            |
+| Author: B. Endres (endres@systopia.de)                 |
+| http://www.systopia.de                                 |
+| Development based on org.project60.sepapp              |
++--------------------------------------------------------+
+| License: AGPLv3, see LICENSE file                      |
++-------------------------------------------------------*}
+{crmScope extensionKey='de.systopia.sddpp'}
+
+{htxt id='id-buffer-days'}
+  {ts}Since you usually generate and upload CiviSEPA groups, you won't always be able to submit a new donation as soon as theoretically possible.{/ts}
+  {ts}To mitigate this problem, you can add a couple of buffer days, so you have the time to actually collect money in time.{/ts}
+{/htxt}
+
+{htxt id='id-add-mandate-reference'}
+  {ts}If you active this, the resulting mandate reference will be shown on the confirmation page.{/ts}
+{/htxt}
+
+{htxt id='id-fix-interval-text'}
+  {ts}In non-English environments, the text outlining the interval is still using the English interval term, e.g. "month".{/ts}
+  {ts}Activating this setting will try to fix that.{/ts}
+{/htxt}
+
+{htxt id='id-add-prenotification'}
+  {ts}If you active this, a minimal prenotification will be shown on the confirmation page.{/ts}
+{/htxt}
+
+{htxt id='id-log-level'}
+  {ts}This setting defines how much information about the processing will be logged to the CiviCRM log.{/ts}
+{/htxt}
+
+{/crmScope}
