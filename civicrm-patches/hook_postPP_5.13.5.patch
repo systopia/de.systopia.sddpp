@@ -1,0 +1,59 @@
+From c90c8248cce45cb6f9da95e33e1c68565df7efc9 Mon Sep 17 00:00:00 2001
+From: "B. Endres" <endres@systopia.de>
+Date: Fri, 22 Oct 2021 09:34:12 +0200
+Subject: [PATCH] added postPP hook
+
+---
+ CRM/Contribute/Form/Contribution/Confirm.php |  2 ++
+ CRM/Utils/Hook.php                           | 20 ++++++++++++++++++++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/CRM/Contribute/Form/Contribution/Confirm.php b/CRM/Contribute/Form/Contribution/Confirm.php
+index 9add6a4ec12..4b75a3d9700 100644
+--- a/CRM/Contribute/Form/Contribution/Confirm.php
++++ b/CRM/Contribute/Form/Contribution/Confirm.php
+@@ -2288,6 +2288,7 @@ protected function processFormSubmission($contactID) {
+ 
+       $this->_params = CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
+       $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $this->_lineItem);
++      CRM_Utils_Hook::postPP($this->_params, ['membershipParams' => $membershipParams]);
+     }
+     else {
+       // at this point we've created a contact and stored its address etc
+@@ -2326,6 +2327,7 @@ protected function processFormSubmission($contactID) {
+         // It seems this line is hit when there is a zero dollar transaction & in tests, not sure when else.
+         $this->completeTransaction($result, $result['contribution']->id);
+       }
++      CRM_Utils_Hook::postPP($paymentParams, ['result' => $result]);
+       return $result;
+     }
+   }
+diff --git a/CRM/Utils/Hook.php b/CRM/Utils/Hook.php
+index a47f3076d7f..6c6497fde96 100644
+--- a/CRM/Utils/Hook.php
++++ b/CRM/Utils/Hook.php
+@@ -2530,4 +2530,24 @@ public static function postIPNProcess(&$IPNData) {
+     );
+   }
+ 
++  /**
++   * Post PaymentProcessor Hook will be invoked after the payment processor
++   *   and the page have completed their work
++   *
++   * @param array $parameters
++   *   all payment processor parameters
++   *
++   * @param array $context_data
++   *   additional context data, depending on where the hook is called
++   *
++   * @return mixed
++   */
++  public static function postPP($parameters, $context_data) {
++    return self::singleton()->invoke(['parameters', 'context_data'],
++                                     $parameters, $context_data, self::$_nullObject,
++                                     self::$_nullObject, self::$_nullObject, self::$_nullObject,
++                                     'civicrm_postPP'
++    );
++  }
++
+ }
