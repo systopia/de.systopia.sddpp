@@ -116,6 +116,7 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
         $sdd_creditor_id = $sdd_creditor['id'];
 
         // now, let's do this:
+        $mandate = null;
         if (!empty($parameters['is_recur']) && !empty($parameters['contributionRecurID'])) {
             // RECURRING DONATION
 
@@ -177,6 +178,26 @@ class CRM_Core_Payment_SDDPP extends CRM_Core_Payment
                 'iban' => $parameters['iban'],
                 'bic' => $parameters['bic'],
             ]);
+        }
+
+        // todo: render new text snippets
+        $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate['id']]);
+        $injected_params = [];
+        if (Civi::settings()->get(CRM_Sddpp_Form_Settings::ADD_MANDATE_REFERENCE)) {
+            $injected_params[] = CRM_Sddpp_Form_Settings::ADD_MANDATE_REFERENCE;
+            Civi::resources()->addVars('sddpp', [
+                'mandate_reference' => $mandate['reference'],
+                'mandate_reference_line' => E::ts("Mandate reference: %1", [1 => $mandate['reference']]),
+            ]);
+        }
+        if (Civi::settings()->get(CRM_Sddpp_Form_Settings::FIX_INTERVAL_TEXT)) {
+            $injected_params[] = CRM_Sddpp_Form_Settings::FIX_INTERVAL_TEXT;
+            Civi::resources()->addVars('sddpp', [
+                'new_interval_text' => CRM_Core_Payment_SDDPPHelper::renderIntervalText($mandate, $parameters)
+            ]);
+        }
+        if ($injected_params) {
+            Civi::resources()->addScriptUrl(E::url('js/adjust_thank_you.js'));
         }
     }
 

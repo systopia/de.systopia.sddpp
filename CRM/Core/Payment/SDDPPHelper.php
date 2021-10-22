@@ -79,6 +79,28 @@ class CRM_Core_Payment_SDDPPHelper
     }
 
     /**
+     * Render a new, better, interval text for the thank-you page
+     *
+     * @param $mandate    array mandate data
+     * @param $parameters array all post-process parameters
+     */
+    public static function renderIntervalText($mandate, $parameters)
+    {
+        if ($mandate['type'] == 'OOFF') {
+            return E::ts("This donation will be collected from your bank account soon.");
+        } elseif ($mandate['type'] == 'RCUR' && !empty($mandate['entity_id'])) {
+            $recur = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id']]);
+            $txt_frq = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
+                $recur['frequency_interval'], $recur['frequency_unit'], true);
+            return E::ts("The amount will be collected %1 from your bank account, around the %2. day of the month.",
+                [1 => $txt_frq, 2 => $recur['cycle_day']]);
+        } else {
+            CRM_Sddpp_Logger::warning("Couldn't render interval text for mandate: " . json_encode($mandate));
+            return '';
+        }
+    }
+
+    /**
      * Get a sepa creditor
      *
      * @param integer $creditor_id

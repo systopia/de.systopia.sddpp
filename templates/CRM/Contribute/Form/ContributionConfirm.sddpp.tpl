@@ -49,6 +49,7 @@
     <tr><td>{ts domain="org.project60.sepa"}IBAN{/ts}</td> <td>{$bank_account_number}</td> </tr>
     <tr><td>{ts domain="org.project60.sepa"}BIC{/ts}</td>  <td>{$bank_identification_number}</td>  </tr>
     {if $bank_name}<tr><td>{ts domain="org.project60.sepa"}Bank Name{/ts}</td> <td>{$bank_name}</td> </tr>{/if}
+    {if $mandate_reference}<tr><td>{ts domain="org.project60.sepa"}Mandate Reference{/ts}</td> <td>{$mandate_reference}</td> </tr>{/if}
   </table>
   {/if}
 </div>
