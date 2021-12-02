@@ -20,15 +20,15 @@
         {/foreach}
     </select>
 {else}
-    <span id="creditor_id"><p><strong>{ts domain="org.project60.sepapp"}No creditor found! Please create a creditor on the
+    <span id="creditor_id"><p><strong>{ts domain="de.systopia.sddpp"}No creditor found! Please create a creditor on the
                     <a href="{$sepa_settings_link}">SEPA settings page</a>
                     .{/ts}</strong></p></span>
 {/if}
 
 {* Create creditors dropdown help *}
 <a id='creditor_id_help'
-   onclick='CRM.help("{ts domain="org.project60.sepapp"}Creditor{/ts}", {literal}{"id":"id-creditor-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;'
-   href="#" title="{ts domain="org.project60.sepapp"}Help{/ts}" class="helpicon">&nbsp;</a>
+   onclick='CRM.help("{ts domain="de.systopia.sddpp"}Creditor{/ts}", {literal}{"id":"id-creditor-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;'
+   href="#" title="{ts domain="de.systopia.sddpp"}Help{/ts}" class="helpicon">&nbsp;</a>
 
 
 {* Create creditors dropdown for test pp *}
