@@ -82,7 +82,7 @@
     <script type="text/javascript">
         let busy_icon_url = "{$config->resourceBase}i/loading.gif";
         let sepa_hide_bic_enabled = parseInt("{$sepa_hide_bic}");
-        let sepa_lookup_bic_error_message = "{ts domain="org.project60.sepapp"}Bank unknown, please enter BIC.{/ts}";
+        let sepa_lookup_bic_error_message = "{ts domain="de.systopia.sddpp"}Bank unknown, please enter BIC.{/ts}";
         let sepa_lookup_bic_timerID = 0;
         let sepa_lookup_bic_timeout = 1000;
         {literal}

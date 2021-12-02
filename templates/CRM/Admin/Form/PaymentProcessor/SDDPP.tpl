@@ -3,7 +3,7 @@
 | Copyright (C) 2021 SYSTOPIA                            |
 | Author: B. Endres (endres@systopia.de)                 |
 | http://www.systopia.de                                 |
-| Development based on org.project60.sepapp              |
+| Development based on de.systopia.sddpp              |
 +--------------------------------------------------------+
 | License: AGPLv3, see LICENSE file                      |
 +-------------------------------------------------------*}
@@ -39,15 +39,15 @@
         {/foreach}
     </select>
 {else}
-    <span id="test_creditor_id"><p><strong>{ts domain="org.project60.sepapp"}No creditor found! Please create a creditor on the
+    <span id="test_creditor_id"><p><strong>{ts domain="de.systopia.sddpp"}No creditor found! Please create a creditor on the
                     <a href="{$sepa_settings_link}">SEPA settings page</a>
                     .{/ts}</strong></p></span>
 {/if}
 
 {* Create test creditors dropdown help *}
 <a id='test_creditor_id_help'
-   onclick='CRM.help("{ts domain="org.project60.sepapp"}Creditor{/ts}", {literal}{"id":"id-creditor-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;'
-   href="#" title="{ts domain="org.project60.sepapp"}Help{/ts}" class="helpicon">&nbsp;</a>
+   onclick='CRM.help("{ts domain="de.systopia.sddpp"}Creditor{/ts}", {literal}{"id":"id-creditor-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;'
+   href="#" title="{ts domain="de.systopia.sddpp"}Help{/ts}" class="helpicon">&nbsp;</a>
 
 
 <script type="text/javascript">
